@@ -31,6 +31,11 @@ func NewApp() *cli.App {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
+			Name:  "dsn, n",
+			Value: "MYSQL_DSN",
+			Usage: "specify an environment variable containing a mysql specific connection string",
+		},
+		cli.StringFlag{
 			Name:  "env, e",
 			Value: "DATABASE_URL",
 			Usage: "specify an environment variable containing the database URL",
@@ -146,7 +151,15 @@ func action(f func(*dbmate.DB, *cli.Context) error) cli.ActionFunc {
 // getDatabaseURL returns the current environment database url
 func getDatabaseURL(c *cli.Context) (u *url.URL, err error) {
 	env := c.GlobalString("env")
+	dsn := c.GlobalString("dsn")
+	if dsn != "" {
+		dsn = os.Getenv(dsn)
+	}
 	value := os.Getenv(env)
+
+	if value == "" && dsn != "" {
+		return dbmate.GetMySQLURL(dsn)
+	}
 
 	return url.Parse(value)
 }

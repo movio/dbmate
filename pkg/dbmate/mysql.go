@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	_ "github.com/go-sql-driver/mysql" // mysql driver for database/sql
+	"github.com/go-sql-driver/mysql" // mysql driver for database/sql
 )
 
 func init() {
@@ -16,6 +16,30 @@ func init() {
 
 // MySQLDriver provides top level database functions
 type MySQLDriver struct {
+}
+
+// GetMySQLURL turn a DSN into a URL so it can be turned back into a DSN later
+func GetMySQLURL(dsn string) (u *url.URL, err error) {
+	cfg, err := mysql.ParseDSN(dsn)
+	if err != nil {
+		return nil, err
+	}
+	params := url.Values{}
+	for k, v := range cfg.Params {
+		params.Add(k, v)
+	}
+	ui := url.User(cfg.User)
+	if cfg.Passwd != "" {
+		ui = url.UserPassword(cfg.User, cfg.Passwd)
+	}
+	u = &url.URL{
+		Scheme:   "mysql",
+		User:     ui,
+		Host:     cfg.Addr,
+		Path:     cfg.DBName,
+		RawQuery: params.Encode(),
+	}
+	return u, nil
 }
 
 func normalizeMySQLURL(u *url.URL) string {
