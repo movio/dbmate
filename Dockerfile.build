@@ -2,14 +2,13 @@
 FROM golang:1.10
 
 # required to force cgo (for sqlite driver) with cross compile
-ENV CGO_ENABLED 1
+ENV CGO_ENABLED 0
 
 # install database clients
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		mysql-client \
 		postgresql-client \
-		sqlite3 \
 	&& rm -rf /var/lib/apt/lists/*
 
 # development dependencies
