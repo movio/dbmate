@@ -50,7 +50,7 @@ image: TAG ?= latest
 image:
 	$(DOCKER) build -t dbmate:build -f Dockerfile.build .
 	$(DOCKER) create --name dbmate-build dbmate:build
-	$(DOCKER) cp dbmate-build:/go/src/github.com/amacneil/dbmate/dist/dbmate-linux-amd64 ./dbmate-linux-amd64
+	$(DOCKER) cp dbmate-build:/go/src/github.com/amacneil/dbmate/dist/dbmate-linux-musl-amd64 ./dbmate-linux-amd64
 	$(DOCKER) rm -f dbmate-build
 	$(DOCKER) build -t $(IMAGE_NAME) .
 	rm ./dbmate-linux-amd64
